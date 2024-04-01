@@ -78,5 +78,5 @@ class AddressBook(UserDict):
         return {key:val for key,val in self.data.items() if key == name}.get(name)
 
     def delete(self, name):
-        return self.data.pop(self.find(name), None)
+        return self.data.pop(name, None)
     
