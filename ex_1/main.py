@@ -18,7 +18,7 @@ def main():
     book.add_record(jane_record)
 
     # Виведення всіх записів у книзі
-    for record in book.data:
+    for name, record in book.data.items():
         print(record)
 
     # Знаходження та редагування телефону для John

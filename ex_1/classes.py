@@ -16,6 +16,7 @@
 # Редагування телефонів.
 # Пошук телефону.
 
+from collections import UserDict
 from typing import Any
 
 
@@ -37,7 +38,7 @@ class Phone(Field):
         super().__init__(phone) 
 
     def is_valid(self, phone):
-        return len(phone)==10 and str(phone).isalnum()
+        return len(phone)==10 and str(phone).isdigit()
 
 class Record():
     def __init__(self, name):
@@ -45,49 +46,37 @@ class Record():
         self.items = []
     
     def add_phone(self, phone):
-        try:
-            ph = Phone(phone)
-            self.items.append(ph)
-            return ph
-        except ValueError:
-            return
+        ph = Phone(phone)
+        self.items.append(ph)
+        return ph
 
     def find_phone(self, phone):
-        try:
-            return list(filter(lambda x:x.value == phone, self.items))[0]
-        except IndexError:
-            return
+        return list(filter(lambda x:x.value == phone, self.items))[0]
 
-
-    def delete_phone(self, phone):
+    def remove_phone(self, phone):
         ph = self.find_phone(phone)
         if ph:
             self.items.remove(ph)
         return ph
     
     def edit_phone(self, old_phone, new_phone):
-        self.add_phone(new_phone)
-        self.delete_phone(old_phone)
+        Phone(old_phone)                            #if old_phone incorrect then Phone() - rise exception "ValueError"
+        self.add_phone(new_phone)                   #add_phone() - call Phone() inside for check format
+        self.remove_phone(old_phone)
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.items)}"
 
-class AddressBook():
+class AddressBook(UserDict):
     def __init__(self):
-        self.data = []
+        super().__init__()
     
     def add_record(self, record:Record):
-        self.data.append(record)
+        self.data[record.name.value] = record
     
     def find(self, name):
-        try:
-            return list(filter(lambda x: x.name.value == name, self.data))[0]
-        except IndexError:
-            return
+        return {key:val for key,val in self.data.items() if key == name}.get(name)
 
     def delete(self, name):
-        record = self.find(name)
-        if record:
-            self.data.remove(record)
-        return record
+        return self.data.pop(self.find(name), None)
     
